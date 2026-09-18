@@ -30,8 +30,12 @@ claude-config/
 
 ```powershell
 git clone git@github.com:ZFF00/claude-config.git "$env:LOCALAPPDATA\claude-skills"
-& "$env:LOCALAPPDATA\claude-skills\deploy.ps1"
+& "$env:LOCALAPPDATA\claude-skills\deploy.ps1"          # 消费端：装自动 pull
+# 主编辑机（authority，只手动 pull）改用：
+# & "$env:LOCALAPPDATA\claude-skills\deploy.ps1" -NoAutoPull
 ```
+
+> Windows 无管理员/开发者模式时，文件 symlink 会失败，脚本自动降级为 **hardlink**（无需管理员，`settings.json`/`CLAUDE.md` 与仓库同为一份文件）。目录用 junction，同样无需管理员。
 
 ### Linux / HA 服务器
 
