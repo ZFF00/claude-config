@@ -3,8 +3,13 @@
     "source": {
       "source": "github",
       "repo": "anthropics/claude-plugins-official"
+    }
+  },
+  "thedotmack": {
+    "source": {
+      "source": "github",
+      "repo": "thedotmack/claude-mem"
     },
-    "installLocation": "C:\\Users\\PC-0312\\.claude\\plugins\\marketplaces\\claude-plugins-official",
-    "lastUpdated": "2026-09-11T02:45:33.126Z"
+    "autoUpdate": true
   }
 }
