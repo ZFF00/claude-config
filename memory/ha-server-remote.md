@@ -1,0 +1,25 @@
+---
+name: ha-server-remote
+description: "HA server (192.168.1.42, ssh alias \"HA\", user zhangfengfeng) setup — install script, node via partial nvm, no passwordless sudo; plus two SSH-from-Windows pitfalls (CRLF here-strings, path-sanitizer illusions)"
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 2519b68e-89c0-4825-a7e8-e08a0c182a56
+  modified: 2026-09-18T01:55:34.376Z
+---
+
+The user's "HA" server: ssh alias `HA` in `~/.ssh/config` → 192.168.1.42, user zhangfengfeng, key `~/.ssh/id_ed25519_ha`. Real remote HOME is `/home/zhangfengfeng` (tool output may display it as a sanitized `/Users/...` placeholder — see pitfalls below). Also aliases `HA_old` (192.168.1.41) and `HA_claw` (claw@192.168.1.41). Ubuntu 24.04-based, sudo requires a password.
+
+Provisioning is done by `~/install-sub2api-codex-claude.sh` (installs/updates Codex + Claude Code via npm user prefix `~/.local/share/npm-global`, wrappers in `~/.local/bin`, env in `~/.config/sub2api-codex-claude/env`, MicuAPI gateway). It runs fully non-interactively by presetting env vars: `INSTALL_CODEX/INSTALL_CLAUDE/UPDATE_CLAUDE/STOP_RUNNING_CLAUDE`, `CLAUDE_BASE_URL/CLAUDE_MODEL/CLAUDE_API_KEY` (and CODEX_* equivalents). On 2026-09-17 installed Claude Code 2.1.274 this way; verified with a real `claude -p` call through micuapi.
+
+Node: no system node; nvm is a *partial* install — `~/.nvm/versions/node/v24.14.1` exists but `nvm.sh` does not. Prepend `$HOME/.nvm/versions/node/v24.14.1/bin` to PATH to get node/npm without sudo.
+
+The micuapi Claude key (`sk-…`, 51 chars) can be recovered locally from `%LOCALAPPDATA%\Claude-3p\host-creds-*.json` (`.env.ANTHROPIC_AUTH_TOKEN`); the server env file also stores it after install. Transfer keys via a scp'd BOM-less temp file, never on the ssh command line.
+
+Data layout (inventoried 2026-09-17): data disk `/opt/disk` 49T (36T free), user data at `~/disk -> /opt/disk/zhangfengfeng`, omics repo at `~/disk/Data` (716G, a git repo tracking code/manifests only). Key dirs: `pan_cancer_single_cell_spatial_transcriptomics` 358G (server-side downloads, catalog/ has SHA-256 for all files), `RDC_evaluation` 83G, `pan_cancer_plasma_proteomics` 14G, `pan_cancer_proteomics_integrated` (catalog+scoring). **D1 membrane-protein list versions** (`RDC_evaluation/results/dimensions/d1/core/releases/`): baseline & v2.0 = 6,078; v2.1 = 6,946; **v2.2 (latest, authoritative) = 6,503** (core 3,800 / extended 1,024 / predicted 1,047 / conflict 632) — v2.2 dropped 443 v2.1 candidates outside the frozen protein-coding canonical universe, and the ranking universe was expanded from 4,223 to 6,503 at v1.5+ (registry `versions/version_registry_v1.0.tsv`; "650" in docs is only a capacity-sensitivity depth, not a candidate pool). Don't quote counts from `.cache/D1_compare_preflight.tsv` (3,618 — preflight subset, wrong); beware `find | head` truncation hiding newer release dirs like v2_2. The 2026-08-07 "completed" 28GB single-cell/spatial transfer from Windows went to the OLD server .41 (`/opt/disk/claw/Data`), NOT to .42 — on .42 that path is an empty skeleton; the two machines' datasets are independent. Hardware: 224 cores, 1TB RAM, 8× RTX PRO 6000 (nvidia-smi hangs — check `/proc/driver/nvidia/gpus/*/information` instead). Integration plan doc: WPS云盘/文档/待办/本地-HA服务器泛癌多组学数据整合方案_20260917.md. Integration executed 2026-09-17/18, all phases P0–P6 complete: transfers verified in `~/disk/Data/incoming_windows_20260917/` (39.8k files, SHA-256), audit in `~/disk/Data/integration_audit_20260917/` (final/dataset_qualification_audit_v1.tsv = source of truth for dataset admission; verdicts strict/fuzzy/provisional/excluded), merged layer `pan_cancer_proteomics_integrated/v2_merge_20260918/`, coverage matrix `integration_audit_20260917/p6_coverage/d1_coverage_matrix_v1.tsv` (D1 v2.2 6,503 × 33, T1 strict 89.0%, core_set 85.5%). Known hard gaps: ACC/LAML/UCS tissue (UCS has no public data — PDC000125 is UCEC misattributed), 13 plasma codes, 422 core proteins zero-evidence. ACC's only tissue closure path = PXD062822 (needs download).
+
+**Why:** first install cost many detours on two illusions worth remembering.
+
+**How to apply:**
+1. CRLF pitfall: piping a PowerShell here-string to `ssh HA "bash -s"` sends `\r\n` line endings **and** a UTF-8 BOM; the trailing `\r` glues to the last token per line, producing fake errors like `/dev/null: Permission denied` (it tried to create `/dev/null\r`) and `ls: cannot access '/Users'`. Prefer single-line `ssh HA '...'` commands or scp a file written with `[IO.File]::WriteAllText(..., UTF8Encoding($false))`.
+2. Path-sanitizer illusion: the harness rewrites home-dir paths in tool output to placeholders (local `C:\Users\<name>` and remote `/home/zhangfengfeng` both shown as `C:/Users/PC-0312*` variants) and sometimes reverse-translates them in commands. If remote paths look impossible/contradictory, check raw bytes with `echo -n "$HOME" | od -c` before concluding anything is broken. Related: [[claude-desktop-3p-setup]].

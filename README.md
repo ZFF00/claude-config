@@ -1,9 +1,56 @@
-# claude-skills
+# claude-config
 
-Claude Code 的 skill 目录（真实位置）。`~/.claude/skills` 是指向这里的目录联接（junction）。
+跨机器统一的 Claude Code 配置：技能、全局设置、记忆、定时任务、插件登记。
 
-- 来源：同级的 `skills/`（Codex skill 目录）中筛选出的 Claude 兼容 skill 的副本
-- 原则：这里的文件是**副本**，可以自由修改；`skills/` 里的原件不动
-- 路径差异：副本里 `~/.codex/skills` / `$CODEX_HOME/skills` 已替换为 `~/.claude/skills`
+## 仓库结构
 
-导入脚本：`import-codex-skills-to-claude.ps1`（复制 + 建立 junction）
+```
+claude-config/
+├── skills/                        # 全部技能（→ ~/.claude/skills）
+├── settings.json                  # 全局设置（→ ~/.claude/settings.json）；不含凭据
+├── CLAUDE.md                      # 全局指令/记忆（→ ~/.claude/CLAUDE.md）
+├── memory/                        # 原始项目级记忆备份（参考用）
+├── scheduled-tasks/               # 定时任务定义
+├── plugins/known_marketplaces.json# 插件市场登记（本体不同步，各机重拉）
+├── deploy.ps1                     # Windows 一键部署
+├── deploy.sh                      # Linux/HA 一键部署
+└── .gitignore / .gitattributes
+```
+
+## 不同步的内容（务必留在本机）
+
+- **凭据**：`~/.claude.json`、`.credentials.json`（含 token/账号，会串号）
+- **缓存/会话/历史**：`cache/ sessions/ debug/ telemetry/ history.jsonl`
+- **本机覆盖**：`settings.local.json`（每台不同的网关地址/代理等放这里）
+- **插件本体**：`plugins/marketplaces/`（缓存，`/plugin marketplace add` 会自动重拉）
+
+## 新机器部署
+
+### Windows
+
+```powershell
+git clone git@github.com:ZFF00/claude-config.git "$env:LOCALAPPDATA\claude-skills"
+& "$env:LOCALAPPDATA\claude-skills\deploy.ps1"
+```
+
+### Linux / HA 服务器
+
+```bash
+git clone git@github.com:ZFF00/claude-config.git ~/claude-config && bash ~/claude-config/deploy.sh
+```
+
+`deploy` 脚本做的事：把 `skills/`、`settings.json`、`CLAUDE.md`、`scheduled-tasks/` 链接（junction/symlink）到 `~/.claude/` 下对应位置；不覆盖已存在的本机文件（会先备份）。
+
+## 日常同步
+
+- **拉取（自动）**：装一次定时任务，每小时 `git pull --ff-only`。
+  - Windows：`schtasks /create /tn "claude-config-sync" /tr "git -C \"%LOCALAPPDATA%\claude-skills\" pull --ff-only" /sc hourly /f`
+  - Linux：`(crontab -l; echo "0 * * * * git -C ~/claude-config pull --ff-only -q") | crontab -`
+- **推送（手动）**：在改动的机器上 `git -C <repo> add -A && git commit -m "..." && git push`。
+  - 只有一台当"权威"来改，其它机器只 pull，可避免合并冲突。
+
+## 注意事项
+
+- 编辑 `settings.json` 务必 **UTF-8 无 BOM**（BOM 会让 Claude 解析失败）。
+- 行尾由 `.gitattributes` 统一为 LF（防 Windows↔Linux 乱码）。
+- 技能库不要放在网盘同步目录（无合并、占位文件导致复制不全）——用本仓库 + git 管理。

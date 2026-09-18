@@ -1,0 +1,37 @@
+# 全局环境与工作约定（跨机器同步）
+
+> 本文件由 claude-config 仓库同步到各机器的 `~/.claude/CLAUDE.md`，每次会话自动加载。
+> 原始项目级记忆备份在本仓库 `memory/` 下。
+
+## 通用（所有机器适用）
+
+- **无 Claude.ai 账号**：仅用第三方中转 (micuapi.ai) 的 API key，通过 `ANTHROPIC_BASE_URL` / `ANTHROPIC_AUTH_TOKEN` 配置。不要建议 claude.ai 登录流程。
+- **中转站指纹校验**：micuapi 只放行标准 Claude Code 客户端；裸 curl / 非标客户端会被 400/503 拒绝。
+- **写 JSON 必须无 BOM**：用 PowerShell/记事本编辑 `settings.json` 等会加 UTF-8 BOM，导致解析失败（"Unexpected token"）。写法：`[IO.File]::WriteAllText(path, text, (New-Object System.Text.UTF8Encoding($false)))`。
+- **路径消毒幻觉**（重要）：本 harness 会把家目录路径改写成占位符显示（本地 `C:/Users/PC-0312*`、远程 `/home/...` 都可能显示成同一形态），有时还会反向翻译命令里的路径。**症状**：`Test-Path "$env:X\y"`(字符串拼接) 与 `-LiteralPath` 结果不一致、递归遍历卡在云盘占位文件。**对策**：文件操作用 `-LiteralPath` + 变量；判断真实路径存疑时用 `od -c` / `fsutil reparsepoint query` 看原始字节；git 操作用 `git -C <dir>` 而非 `Set-Location`。
+
+## 技能管理（skill）
+
+- 技能库由 **claude-config 仓库** 统一管理：仓库 `skills/` ← junction/symlink → `~/.claude/skills`。
+- 社区技能（`@user_xxx`/`@clawhub_xxx`）落在二级目录，Claude Code 扫不到，需建 junction 提级：`New-Item -ItemType Junction -Path ~/.claude/skills/<技能名> -Target <二级路径>`。
+- 删 junction：Windows 用 `[System.IO.Directory]::Delete($link,$false)` 或 `cmd /c rmdir`（**不要**用 `Remove-Item -Recurse`，会穿透删目标文件）。
+- **安装技能的流程偏好**：模糊需求（"想要 XX 技能"）→ 先调研/下载到临时目录审阅 → 给比较和推荐 → **等用户拍板再正式装**；不要直接装推荐项。明确点名单个技能可直接装，但先检查内容（注入/恶意命令/数据外流）。
+
+## 日报
+
+- 每日工作日报走技能 `agent-daily-report` + `git-daily-report`；**默认手动触发**（用户明确要求不开自动定时任务，尽管技能 SKILL.md 里写"每晚22:00"——那只是模板话术，本身无调度能力）。
+- 日报输出到 `WPS云盘/文档/待办/日报/日报-YYYY-MM-DD.md`。
+
+## Windows PC 专属
+
+- Claude Desktop 走 3P gateway 模式，配置在 `%LOCALAPPDATA%\Claude-3p\`（`deploymentMode: 3p`），与 `%APPDATA%\Claude\` 无关。桌面问题先看 `Claude-3p\logs\main.log`。
+- **代理坑**：桌面 app 会把系统代理 `127.0.0.1:33210` 注入 CLI 的 HTTP(S)_PROXY（即使 `ProxyEnable=0`）。本地代理客户端关闭时，桌面对话报 `ConnectionRefused`；独立 `claude` CLI 不受影响。已设 WinINET `ProxyOverride=www.micuapi.ai;*.micuapi.ai` 让网关直连。Clash 类客户端可能覆盖此项，横幅复发就在代理客户端里重加 bypass。
+- 技能库物理位置：`%LOCALAPPDATA%\claude-skills`（本仓库 clone），已迁出 WPS 云盘（云盘无合并机制、占位文件会导致复制不全）。
+
+## HA 服务器专属
+
+- ssh 别名 `HA` → 192.168.1.42（用户 zhangfengfeng）；另有 `HA_old`(.41)、`HA_claw`。Ubuntu 24.04，sudo 需密码。
+- 部署脚本 `~/install-sub2api-codex-claude.sh`，可预设 env 全非交互安装 Codex+Claude Code。
+- node 无系统安装，nvm 是部分安装（有 `~/.nvm/versions/node/v24.14.1` 但无 nvm.sh）→ 把该 bin 目录加进 PATH。
+- **SSH from Windows 坑**：PowerShell here-string 通过 `ssh HA "bash -s"` 会带 CRLF + BOM，尾部 `\r` 会粘到每行最后一个 token（假错误如 `/dev/null: Permission denied`）。优先用单行 `ssh HA '...'`，或 scp 一个无 BOM 文件过去执行。
+- 数据盘 `/opt/disk` 49T；组学库 `~/disk/Data`（git 仓库，只跟踪代码/清单）。
