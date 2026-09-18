@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scientific Visualization"
+  short_description: "Create truthful publication-ready scientific figures"
+  default_prompt: "Use $scientific-visualization to create or audit a publication-ready scientific figure."

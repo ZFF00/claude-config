@@ -1,0 +1,4 @@
+interface:
+  display_name: "uv Package Manager"
+  short_description: "Manage Python environments and dependencies with uv"
+  default_prompt: "Use $uv-package-manager to set up or improve dependency management for this Python project."

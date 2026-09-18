@@ -1,0 +1,4 @@
+interface:
+  display_name: "AnnData"
+  short_description: "Manage annotated matrices and h5ad data"
+  default_prompt: "Use $anndata to inspect, transform, or organize this annotated matrix or h5ad dataset."

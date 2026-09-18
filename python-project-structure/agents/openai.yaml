@@ -1,0 +1,4 @@
+interface:
+  display_name: "Python Project Structure"
+  short_description: "Plan maintainable Python package layouts"
+  default_prompt: "Use $python-project-structure to plan a maintainable Python directory and module layout."

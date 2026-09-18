@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Project README"
+  short_description: "Create a concise, project-aware README"
+  default_prompt: "Use $create-readme to review this project and create or improve README.md."

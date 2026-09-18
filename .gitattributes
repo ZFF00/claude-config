@@ -1,0 +1,12 @@
+# 统一行尾为 LF，防止 Windows ↔ Linux(HA服务器) 同步时 CRLF 乱码
+* text=auto eol=lf
+
+# 明确二进制类型，避免被当文本转换
+*.png binary
+*.jpg binary
+*.gif binary
+*.pdf binary
+*.zip binary
+*.exe binary
+*.dll binary
+*.bin binary

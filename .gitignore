@@ -1,0 +1,26 @@
+# === 锁文件/临时（会造成多机冲突）===
+.skills_store_lock.json
+*.lock
+.DS_Store
+Thumbs.db
+
+# === 依赖/构建产物（体积大，新机重装即可）===
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+dist/
+build/
+*.egg-info/
+
+# === 缓存 ===
+.cache/
+*.log
+*.tmp
+
+# === 大型二进制（如需可按需取消注释同步）===
+# *.exe
+# *.dll
+# *.bin

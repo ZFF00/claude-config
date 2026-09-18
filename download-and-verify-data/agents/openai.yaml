@@ -1,0 +1,4 @@
+interface:
+  display_name: "Download and Verify Data"
+  short_description: "Download public data with integrity checks"
+  default_prompt: "Use $download-and-verify-data to download this public dataset and produce a verified integrity report."

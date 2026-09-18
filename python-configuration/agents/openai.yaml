@@ -1,0 +1,4 @@
+interface:
+  display_name: "Python Configuration"
+  short_description: "Manage typed settings, environments, and secrets"
+  default_prompt: "Use $python-configuration to design safe, typed configuration for this Python project."

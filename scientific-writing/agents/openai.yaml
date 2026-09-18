@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scientific Writing"
+  short_description: "Draft and audit evidence-grounded scientific writing"
+  default_prompt: "Use $scientific-writing to draft or audit this scientific manuscript section with evidence traceability."

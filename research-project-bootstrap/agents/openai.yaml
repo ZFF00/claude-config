@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Project Bootstrap"
+  short_description: "Scaffold reproducible research and Python projects"
+  default_prompt: "Use $research-project-bootstrap to create a reproducible project structure and its core documentation."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "WPS Cloud Localizer"
+  short_description: "Expose or download WPS cloud folders safely"
+  default_prompt: "Use $wps-cloud-localizer to make a WPS cloud folder visible to local programs without downloading file contents unless requested."

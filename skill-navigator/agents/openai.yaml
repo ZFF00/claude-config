@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Navigator"
+  short_description: "Inspect, explain, and route installed Codex skills"
+  default_prompt: "Use $skill-navigator to inspect installed skills and recommend the best one for this task."

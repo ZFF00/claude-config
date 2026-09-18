@@ -1,0 +1,4 @@
+interface:
+  display_name: "Python Testing Patterns"
+  short_description: "Build reliable pytest-based Python test suites"
+  default_prompt: "Use $python-testing-patterns to design or improve the test suite for this Python project."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scanpy Single-Cell Analysis"
+  short_description: "Run reproducible Scanpy single-cell workflows"
+  default_prompt: "Use $scanpy to design or run a reproducible single-cell RNA-seq analysis workflow."

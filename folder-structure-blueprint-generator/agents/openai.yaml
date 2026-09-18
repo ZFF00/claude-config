@@ -1,0 +1,4 @@
+interface:
+  display_name: "Folder Structure Blueprint"
+  short_description: "Analyze and document project folder structures"
+  default_prompt: "Use $folder-structure-blueprint-generator to analyze this project and document its directory structure."
