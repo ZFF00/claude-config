@@ -33,7 +33,9 @@ ln -sfn "$REPO/scheduled-tasks" "$CL/scheduled-tasks"
 echo "[OK] scheduled-tasks symlink"
 
 # 5. 每小时自动拉取
-( crontab -l 2>/dev/null | grep -v 'claude-config pull' ; echo "0 * * * * git -C \"$REPO\" pull --ff-only -q" ) | crontab -
+# 注意：set -euo pipefail 下，空 crontab 时 `crontab -l` 退出 1、`grep -v` 无匹配也退出 1，
+# 会让整条管线在 pipefail 下失败并中断脚本（软链已建好但 crontab 未注册）。`|| true` 兜底两种情况。
+( crontab -l 2>/dev/null | grep -v 'claude-config pull' || true ; echo "0 * * * * git -C \"$REPO\" pull --ff-only -q" ) | crontab -
 echo "[OK] 已注册每小时自动 pull (crontab)"
 
 echo ""
