@@ -1,6 +1,10 @@
 # 统一行尾为 LF，防止 Windows ↔ Linux(HA服务器) 同步时 CRLF 乱码
 * text=auto eol=lf
 
+# PowerShell 5.1 对无 BOM 脚本按 ANSI/GBK 解码，GBK 首字节会吞掉行尾 LF（吃掉 param 块）
+# .ps1 必须 CRLF + UTF-8 BOM
+*.ps1 text eol=crlf
+
 # 明确二进制类型，避免被当文本转换
 *.png binary
 *.jpg binary

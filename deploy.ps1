@@ -1,4 +1,4 @@
-# claude-config Windows 部署脚本
+﻿# claude-config Windows 部署脚本
 # 把仓库内容链接到 ~/.claude/ 下对应位置。已存在的本机文件先备份为 .bak。
 # 目录用 junction（无需管理员）；文件优先 symlink，失败则 hardlink（无需管理员），
 # 再失败才复制。默认注册每小时自动 pull；主编辑机可加 -NoAutoPull 跳过。
