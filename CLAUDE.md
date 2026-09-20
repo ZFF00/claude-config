@@ -20,8 +20,8 @@
 ## 技能管理（skill）
 
 - 技能库由 **claude-config 仓库** 统一管理：仓库 `skills/` ← junction/symlink → `~/.claude/skills`。
-- 社区技能（`@user_xxx`/`@clawhub_xxx`）落在二级目录，Claude Code 扫不到，需建 junction 提级：`New-Item -ItemType Junction -Path ~/.claude/skills/<技能名> -Target <二级路径>`。
-- 删 junction：Windows 用 `[System.IO.Directory]::Delete($link,$false)` 或 `cmd /c rmdir`（**不要**用 `Remove-Item -Recurse`，会穿透删目标文件）。
+- **社区技能一律实体化到 `skills/` 顶层**（下载后把技能目录移到顶层，不保留 `@user_xxx`/`@clawhub_xxx` 二级目录，来源写在提交信息里）。**仓库内禁止提交 symlink/junction**——Linux 建的 symlink 到 Windows 会退化成文本文件（2026-09 git-daily-report 踩坑）；链接属于机器，不属于仓库。
+- 删 junction（如本机遗留）：Windows 用 `[System.IO.Directory]::Delete($link,$false)` 或 `cmd /c rmdir`（**不要**用 `Remove-Item -Recurse`，会穿透删目标文件）。
 - **安装技能的流程偏好**：模糊需求（"想要 XX 技能"）→ 先调研/下载到临时目录审阅 → 给比较和推荐 → **等用户拍板再正式装**；不要直接装推荐项。明确点名单个技能可直接装，但先检查内容（注入/恶意命令/数据外流）。
 
 ## 日报
