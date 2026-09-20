@@ -12,5 +12,32 @@
   "outputStyle": "Explanatory",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark"
+  "theme": "dark",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "r=$(dirname \"$(readlink -f \"$HOME/.claude/skills\" 2>/dev/null)\"); git -C \"$r\" remote get-url origin 2>/dev/null | grep -q 'ZFF00/claude-config' && git -C \"$r\" pull --ff-only --quiet >/dev/null 2>&1; true",
+            "async": true,
+            "timeout": 60,
+            "statusMessage": "同步 claude-config (pull)"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "r=$(dirname \"$(readlink -f \"$HOME/.claude/skills\" 2>/dev/null)\"); if git -C \"$r\" remote get-url origin 2>/dev/null | grep -q 'ZFF00/claude-config' && [ -n \"$(git -C \"$r\" status --porcelain 2>/dev/null)\" ]; then git -C \"$r\" add -A && git -C \"$r\" -c user.name=ZFF00 -c user.email=1138903623@qq.com commit -q -m \"chore(auto-sync): $(hostname)\" && { git -C \"$r\" push -q 2>/dev/null || { git -C \"$r\" pull --rebase -q && git -C \"$r\" push -q; }; }; fi >/dev/null 2>&1; true",
+            "timeout": 60,
+            "statusMessage": "同步 claude-config (push)"
+          }
+        ]
+      }
+    ]
+  }
 }

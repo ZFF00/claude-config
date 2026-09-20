@@ -10,6 +10,12 @@
 - **写 JSON 必须无 BOM**：用 PowerShell/记事本编辑 `settings.json` 等会加 UTF-8 BOM，导致解析失败（"Unexpected token"）。写法：`[IO.File]::WriteAllText(path, text, (New-Object System.Text.UTF8Encoding($false)))`。
 - **路径消毒幻觉**（重要）：本 harness 会把家目录路径改写成占位符显示（本地 `C:/Users/PC-0312*`、远程 `/home/...` 都可能显示成同一形态），有时还会反向翻译命令里的路径。**症状**：`Test-Path "$env:X\y"`(字符串拼接) 与 `-LiteralPath` 结果不一致、递归遍历卡在云盘占位文件。**对策**：文件操作用 `-LiteralPath` + 变量；判断真实路径存疑时用 `od -c` / `fsutil reparsepoint query` 看原始字节；git 操作用 `git -C <dir>` 而非 `Set-Location`。
 
+## claude-config 仓库同步约定
+
+- **自动同步由 hooks 承担**（settings.json 内，随仓库分发到所有机器）：SessionStart 后台 `git pull --ff-only`（静默失败不阻塞）；SessionEnd 检测脏改动则 `add + commit + push`（push 被拒时先 `pull --rebase` 重试）。原 Windows 每小时计划任务 `claude-config-sync` 已停用。
+- **Claude 主动修改配置仓库文件（CLAUDE.md / settings.json / skills / memory 等）后，应立即用有意义的 message commit + push**，不要依赖 SessionEnd 兜底的 `chore(auto-sync)` 提交。
+- 编辑工具（临时文件+重命名写入）和 `git pull` 都会**打断 settings.json / CLAUDE.md 的硬链接**：改完/拉完后核对 `~/.claude/` 与仓库两侧是否一致，不一致就重建硬链接或重跑 deploy 脚本。
+
 ## 技能管理（skill）
 
 - 技能库由 **claude-config 仓库** 统一管理：仓库 `skills/` ← junction/symlink → `~/.claude/skills`。
