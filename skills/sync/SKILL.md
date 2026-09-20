@@ -1,5 +1,5 @@
 ---
-name: sync-config
+name: sync
 description: 手动同步 claude-config 配置仓库：拉取最新、提交推送本地脏改动、修复历史分叉与硬链接脱钩，并汇报每步结果。SessionStart/SessionEnd hooks 静默失败或怀疑配置不同步时使用。
 argument-hint: "（可选）pull=只拉取 / push=只推送 / status=只检查不改动"
 ---
