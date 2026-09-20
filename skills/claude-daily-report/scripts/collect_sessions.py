@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Collect Claude Code CLI session activity for one local calendar day.
 
-Reads session JSONL transcripts under ~/.claude-2/projects/ and emits
+Reads session JSONL transcripts under ~/.claude/projects/ and emits
 structured JSON evidence for daily reports.
 
 Designed for non-interactive Agent execution:
@@ -107,7 +107,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Collect Claude Code session activity for a local day.")
     parser.add_argument("--date", required=True, help="Target local date, YYYY-MM-DD")
     parser.add_argument("--utc-offset", default="+08:00", help="Local timezone UTC offset (default +08:00, Asia/Shanghai)")
-    parser.add_argument("--projects-dir", default=os.path.expanduser("~/.claude-2/projects"), help="Claude projects dir")
+    parser.add_argument("--projects-dir", default=os.path.expanduser("~/.claude/projects"), help="Claude projects dir")
     parser.add_argument("--snippet-chars", type=int, default=400, help="Max chars per message snippet")
     args = parser.parse_args()
 
