@@ -1,16 +1,29 @@
 ---
 name: handoff
-description: Compact the current conversation into a handoff document for another agent to pick up.
-argument-hint: "What will the next session be used for?"
-disable-model-invocation: true
+description: 交接文档的唯一权威规范：把当前会话压缩成一份交接文档，供新会话或其他 agent 无缝接续。默认写入项目内 .claude/HANDOFF.md，可通过参数指定其他输出路径。只写文档、不清空会话；需要"写完即清空"用 fresh 技能（它调用本技能）。
+argument-hint: "（可选）输出路径，或下个会话的工作重点"
 ---
 
-Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS - not the current workspace.
+把当前会话写成一份交接文档，让一个没有任何本会话记忆的新 agent 能直接接续工作。
 
-Include a "suggested skills" section in the document, naming which skills the next agent should call the Skill tool for.
+## 输出位置
 
-Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
+- 默认：`<当前项目根目录>/.claude/HANDOFF.md`（覆盖旧文件；目录不存在则创建）。
+- 若用户参数是一个路径（含 `/`、`\` 或以 `.md` 结尾），写到该路径。
+- 参数不是路径时，视为下个会话的工作重点，围绕它裁剪文档内容。
 
-Redact any sensitive information, such as API keys, passwords, or personally identifiable information.
+## 内容要求
 
-If the user passed arguments, treat them as a description of what the next session will focus on and tailor the doc accordingly.
+- **任务目标与当前状态**：在做什么、做到哪一步、什么已验证完成。
+- **待办清单**：按优先级列出剩余工作，具体到可执行。
+- **关键文件**：改过/正在改的文件路径及各自状态。
+- **踩过的坑**：本会话试过但走不通的方案、报过的错和原因——防止新会话重踩。
+- **用户中途给出的偏好与纠正**：凡是没来得及落盘到长期记忆或规则文件的，写在这里；更持久的应同时写入长期记忆。
+- **建议技能**：新会话应该调用哪些 skill。
+- 不要复制其他文档（计划、提交记录、规范）已有的内容，用路径引用。
+- 脱敏：不写入密钥、密码、个人信息。
+
+## 注意
+
+- 本技能是交接文档规范的**唯一来源**：修改交接文档的格式或条目时只改这个文件。`fresh` 技能通过 Skill 工具调用本技能，不要在 fresh 里复制这份规范。
+- 本技能不清空会话、不发结束消息，写完文档即结束。
