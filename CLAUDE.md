@@ -12,7 +12,7 @@
 
 ## Claude Desktop 侧边栏会话自归类
 
-- **分组命名规则：`<项目目录名> (<host>)`**，目录名取默认自动分组显示的项目名（通常是仓库/目录 basename，worktree 归主仓库名），host 为 `local`（本机）或服务器简称（如 `HA`）。例：`待办 (local)`、`BioData (HA)`、`RDC-Target-Agent (HA)`。
+- **分组命名规则**：本机目录 → `🟢 <项目目录名>`；服务器目录 → `🔴 <项目目录名> ·<host>`（host 用服务器简称，如 `HA`）。目录名取默认自动分组显示的项目名（通常是仓库/目录 basename，worktree 归主仓库名）。例：`🟢 待办`、`🔴 BioData ·HA`、`🔴 RDC-Target-Agent ·HA`。组名是纯文本不支持颜色，用 emoji 圆点做视觉标记。
 - 会话开始后的第一次回复中，若本会话运行在 Claude Desktop（存在 `ccd_sidebar` 系列 MCP 工具），用 `move_sessions(["self"], <group_id>)` 把本会话归入符合上述命名的分组：先 `list_groups` 找同名组，没有才 `create_group`。
 - **判断 host 不要只看显示路径**（路径消毒会把远程家目录和本地路径显示成同一形态、把本地盘符显示成 `/workspace/volumes/v_xxxx/` 等假形态）。可靠依据：shell 类型（PowerShell=Windows 本机 vs bash）、`Test-Path -LiteralPath`/`ls` 实测文件是否存在、`hostname`/`uname` 输出。`/home/zhangfengfeng...` 实测存在即 HA。
 - 移动 "self" 不需要用户确认；不要顺手移动其他会话（会弹确认打扰用户）。
