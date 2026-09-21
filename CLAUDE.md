@@ -14,7 +14,7 @@
 
 - **分组命名规则**：本机目录 → `💻 <项目目录名>（Local）`；服务器目录 → `🌐 <项目目录名>（<host>）`（host 用服务器简称，如 `HA`；括号为全角）。目录名取**当前工作目录的 basename**（worktree 会话用主仓库目录名）——侧边栏的自动分组显示名在会话内不可见，不要引用。例：`💻 待办（Local）`、`🌐 RDC_evaluation（HA）`。组名是纯文本不支持颜色，用 emoji 做视觉标记。
 - 会话开始后的第一次回复中，若本会话运行在 Claude Desktop（存在 `ccd_sidebar` 系列 MCP 工具），用 `move_sessions(["self"], <group_id>)` 把本会话归入符合上述命名的分组：先 `list_groups` 找同名组，没有才 `create_group`。
-- **判断 host 用运行时身份，不用路径特征**（路径消毒会把远程/本地路径互相伪装，文件存在性探测也不可靠——2026-09-21 曾因"并行会话迁移仓库删旧址 + 路径消毒"叠加，一度误判为 shell 中途换机器，靠 hostname/IP + fsutil hardlink 才厘清）。**未实测 hostname/IP 前禁止建组贴标签**（2026-09-21 有 HA 会话凭猜测自标 Local，靠人发现才纠正；另注意本机也有 MSYS bash，"bash=远程"不成立）。标准动作：执行 `hostname` + `hostname -I`（Windows 用 `ipconfig`），按清单映射标签：`192.168.1.42`→`HA`、`192.168.1.41`→`HA_old`；PowerShell + Windows 盘符环境 → `Local`（办公 PC hostname `DESKTOP-JBCGL8E`）。清单外的机器直接用真实 hostname 当标签，不要猜。（HA 实测 hostname `test-RWS7250-I41-HS621GE-EGS-MGX4`。）
+- **判断 host 用运行时身份，不用路径特征**（路径消毒会把远程/本地路径互相伪装，文件存在性探测也不可靠——2026-09-21 曾因"并行会话迁移仓库删旧址 + 路径消毒"叠加，一度误判为 shell 中途换机器，靠 hostname/IP + fsutil hardlink 才厘清）。**未实测 hostname/IP 前禁止建组贴标签**（2026-09-21 有 HA 会话凭猜测自标 Local，靠人发现才纠正；另注意本机也有 MSYS bash，"bash=远程"不成立）。标准动作：执行 `hostname` + `hostname -I`（Windows 用 `ipconfig`），按清单映射标签：`192.168.1.42`→`HA`、`192.168.1.41`→`HA_old`；PowerShell + Windows 盘符环境 → `Local`（用户有两台本地 Windows 机，均标 `Local`：办公 PC hostname `DESKTOP-JBCGL8E`；便携机 hostname `NB-0514`／IP `192.168.8.211`）。清单外的机器直接用真实 hostname 当标签，不要猜。（HA 实测 hostname `test-RWS7250-I41-HS621GE-EGS-MGX4`。）
 - 移动 "self" 不需要用户确认；不要顺手移动其他会话（会弹确认打扰用户）。
 
 ## claude-config 仓库同步约定
