@@ -56,16 +56,11 @@ git -C "$r" pull --rebase
 - rebase 冲突：展示冲突文件与两边内容，让用户决定（配置仓库多为追加式改动，通常两边都保留）；解决后 `git rebase --continue` 并 push。
 - 提示 non-fast-forward / 历史被改写（远端曾 force push）且本地无独有提交时：`git fetch && git reset --hard origin/main` 对齐，并向用户说明。本地有独有提交则先走第 2 步推送逻辑或问用户。
 
-## 第 4 步：链接完整性（Windows 专属，Linux 跳过）
+## 第 4 步：链接修复（Windows 专属，Linux 跳过）
 
-pull 重写文件会打断硬链接。逐一核对：
+pull 重写文件会打断硬链接。用第 1 步的 inode+diff 检查重新核对（刚 pull 过，状态可能已变化）。
 
-```bash
-diff -q ~/.claude/settings.json "$r/settings.json"
-diff -q ~/.claude/CLAUDE.md "$r/CLAUDE.md"
-```
-
-不一致的用 PowerShell 重建（注意：以仓库侧为准，先确认 `~/.claude` 侧没有未同步的新改动）：
+发现断链/分叉的，用 PowerShell 重建（注意：以仓库侧为准，重建前先 `diff` 确认 `~/.claude` 侧没有独有的新改动——若本地侧有独有内容，先把它合入仓库走第 2 步提交，再重建）：
 
 ```
 Remove-Item -LiteralPath <链接路径> -Force
