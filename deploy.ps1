@@ -2,6 +2,10 @@
 # 把仓库内容链接到 ~/.claude/ 下对应位置。已存在的本机文件先备份为 .bak。
 # 目录用 junction（无需管理员）；文件优先 symlink，失败则 hardlink（无需管理员），
 # 再失败才复制。默认注册每小时自动 pull；主编辑机可加 -NoAutoPull 跳过。
+# 安装位置建议：本仓库放 %USERPROFILE%\.claude-config，勿放 %LOCALAPPDATA%。
+# Claude Desktop 是 MSIX 打包应用，其子进程写 AppData\Local 会被透明重定向进包容器
+# (...\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Local\)，致仓库仅在 Desktop 上下文可见、
+# 且 Reset/卸载 Desktop 时被清空；%USERPROFILE% 根不受此重定向影响。
 param([switch]$NoAutoPull)
 $ErrorActionPreference = "Stop"
 $repo = $PSScriptRoot
