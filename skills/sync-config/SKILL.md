@@ -17,7 +17,21 @@ remote 必须匹配 `ZFF00/claude-config`，否则停止并报告。后续所有
 
 ## 第 1 步：体检（参数 status 只做到这步）
 
-报告：`git -C "$r" status -sb`（脏文件、ahead/behind）+ `git -C "$r" fetch` 后本地与 `origin/main` 的差异。
+报告两块：
+
+1. **git 状态**：`git -C "$r" status -sb`（脏文件、ahead/behind）+ `git -C "$r" fetch` 后本地与 `origin/main` 的差异。
+2. **链接完整性（Windows 专属，Linux 跳过；只读检查）**：断链是本体系最高发的静默故障（任何 pull/编辑都可能打断硬链接），体检必查：
+
+```bash
+for f in settings.json CLAUDE.md; do
+  [ "$(stat -c %i "$HOME/.claude/$f")" = "$(stat -c %i "$r/$f")" ] && echo "$f 链接完好" || echo "$f 链接已断"
+  diff -q "$HOME/.claude/$f" "$r/$f" >/dev/null && echo "$f 内容一致" || echo "$f 内容已分叉"
+done
+```
+
+inode 相同 = 硬链接完好；inode 不同但内容一致 = 链接刚断、尚未分叉；内容分叉 = 已经在吃旧配置。**status 模式只报告不修复**，发现断链时提示用户跑完整 `/sync-config`（或当场确认后按第 4 步重建）。
+
+> ⚠️ 判断路径/布局不要信 harness 显示的路径（家目录会被消毒改写成假形态）：以 `od -c`、`stat -c %i`（inode）、`$LOCALAPPDATA` 等原始字节/属性为准。
 
 ## 第 2 步：推送本地脏改动（参数 pull 跳过）
 
