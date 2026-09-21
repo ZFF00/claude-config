@@ -10,6 +10,14 @@
 - **写 JSON 必须无 BOM**：用 PowerShell/记事本编辑 `settings.json` 等会加 UTF-8 BOM，导致解析失败（"Unexpected token"）。写法：`[IO.File]::WriteAllText(path, text, (New-Object System.Text.UTF8Encoding($false)))`。
 - **路径消毒幻觉**（重要）：本 harness 会把家目录路径改写成占位符显示（本地 `C:/Users/PC-0312*`、远程 `/home/...` 都可能显示成同一形态），有时还会反向翻译命令里的路径。**症状**：`Test-Path "$env:X\y"`(字符串拼接) 与 `-LiteralPath` 结果不一致、递归遍历卡在云盘占位文件。**对策**：文件操作用 `-LiteralPath` + 变量；判断真实路径存疑时用 `od -c` / `fsutil reparsepoint query` 看原始字节；git 操作用 `git -C <dir>` 而非 `Set-Location`。
 
+## Claude Desktop 侧边栏会话自归类
+
+- 会话开始后的第一次回复中，若本会话运行在 Claude Desktop（存在 `ccd_sidebar` 系列 MCP 工具）且当前工作目录是**远程路径**，用 `move_sessions(["self"], <group_id>)` 把本会话归入对应自定义分组（分组不存在则先 `create_group`）：
+  - `/home/...`（HA 服务器等 Linux 主机）→ 分组 **"HA服务器"**。
+  - 本地目录（`C:\Users\...`、其他本地盘符）→ 不动，保持默认按目录名分组。
+- **注意路径消毒**：`/workspace/volumes/v_xxxx/...` 形态是本地盘符被 harness 改写后的显示形态，**不算远程**；家目录占位符同理。拿不准就看 shell 类型/文件系统特征判断真实主机。
+- 移动 "self" 不需要用户确认；不要顺手移动其他会话（会弹确认打扰用户）。
+
 ## claude-config 仓库同步约定
 
 - **自动同步由 hooks 承担**（settings.json 内，随仓库分发到所有机器）：SessionStart 后台 `git pull --ff-only`（静默失败不阻塞）；SessionEnd 检测脏改动则 `add + commit + push`（push 被拒时先 `pull --rebase` 重试）。原 Windows 每小时计划任务 `claude-config-sync` 已停用。
