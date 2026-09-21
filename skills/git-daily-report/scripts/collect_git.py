@@ -8,8 +8,23 @@ Designed for non-interactive Agent execution:
 """
 import argparse
 import json
+import re
 import subprocess
 import sys
+
+DATE_ONLY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def expand_day(value: str | None, end: bool) -> str | None:
+    """Expand a bare YYYY-MM-DD to a full-day boundary.
+
+    git interprets a bare date as midnight, so --since D --until D is an
+    empty window. Expand --since to 00:00:00 and --until to 23:59:59 of
+    that day; anything else (e.g. '1 day ago') passes through unchanged.
+    """
+    if value and DATE_ONLY.match(value):
+        return f"{value} 23:59:59" if end else f"{value} 00:00:00"
+    return value
 
 
 def run_git(args: list[str], repo: str) -> str:
@@ -25,10 +40,14 @@ def run_git(args: list[str], repo: str) -> str:
         sys.exit(2)
 
 
-def collect(repo: str, since: str, until: str | None, author: str | None) -> list[dict]:
+def collect(repo: str, since: str, until: str | None, author: str | None, all_refs: bool) -> list[dict]:
     # Field separator \x1f, record separator \x1e — safe for git log parsing.
     fmt = "%x1f".join(["%H", "%an", "%ad", "%s"]) + "%x1e"
     args = ["log", f"--since={since}", f"--pretty=format:{fmt}", "--date=short"]
+    if all_refs:
+        # Daily-report commits often land on worktree/agent branches that are
+        # not merged into HEAD yet; without --all they are invisible.
+        args.append("--all")
     if until:
         args.append(f"--until={until}")
     if author:
@@ -64,9 +83,17 @@ def main() -> None:
     parser.add_argument("--until", default=None, help="git --until value (optional)")
     parser.add_argument("--author", default=None, help="Filter by author (optional)")
     parser.add_argument("--format", choices=["json", "text"], default="json", help="Output format (default json)")
+    parser.add_argument(
+        "--no-all",
+        dest="all_refs",
+        action="store_false",
+        help="Only search HEAD's branch instead of all refs (default: --all, covering worktree/unmerged branches)",
+    )
     args = parser.parse_args()
 
-    commits = collect(args.repo, args.since, args.until, args.author)
+    since = expand_day(args.since, end=False)
+    until = expand_day(args.until, end=True)
+    commits = collect(args.repo, since, until, args.author, args.all_refs)
 
     if args.format == "json":
         print(json.dumps({"count": len(commits), "commits": commits}, ensure_ascii=False, indent=2))
