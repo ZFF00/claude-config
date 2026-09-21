@@ -14,7 +14,7 @@
 
 - **分组命名规则**：本机目录 → `💻 <项目目录名>（Local）`；服务器目录 → `🌐 <项目目录名>（<host>）`（host 用服务器简称，如 `HA`；括号为全角）。目录名取默认自动分组显示的项目名（通常是仓库/目录 basename，worktree 归主仓库名）。例：`💻 待办（Local）`、`🌐 BioData（HA）`。组名是纯文本不支持颜色，用 emoji 做视觉标记。
 - 会话开始后的第一次回复中，若本会话运行在 Claude Desktop（存在 `ccd_sidebar` 系列 MCP 工具），用 `move_sessions(["self"], <group_id>)` 把本会话归入符合上述命名的分组：先 `list_groups` 找同名组，没有才 `create_group`。
-- **判断 host 不要只看显示路径**（路径消毒会把远程家目录和本地路径显示成同一形态、把本地盘符显示成 `/workspace/volumes/v_xxxx/` 等假形态）。可靠依据：shell 类型（PowerShell=Windows 本机 vs bash）、`Test-Path -LiteralPath`/`ls` 实测文件是否存在、`hostname`/`uname` 输出。`/home/zhangfengfeng...` 实测存在即 HA。
+- **判断 host 用运行时身份，不用路径特征**（路径消毒会把远程/本地路径互相伪装，连发给 shell 的命令里的路径都可能被改写，文件存在性探测不可靠；会话的 shell 执行环境还可能中途换机器——2026-09-21 实测发生过）。标准动作：执行 `hostname` + `hostname -I`（Windows 用 `ipconfig`），按清单映射标签：`192.168.1.42`→`HA`、`192.168.1.41`→`HA_old`；PowerShell + Windows 盘符环境 → `Local`（PC 与笔记本 `DESKTOP-JBCGL8E`/NB-0514 都算）。清单外的机器直接用真实 hostname 当标签，不要猜。（HA 实测 hostname `test-RWS7250-I41-HS621GE-EGS-MGX4`。）
 - 移动 "self" 不需要用户确认；不要顺手移动其他会话（会弹确认打扰用户）。
 
 ## claude-config 仓库同步约定
