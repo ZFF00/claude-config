@@ -40,6 +40,7 @@
 
 - Claude Desktop 走 3P gateway 模式，配置在 `%LOCALAPPDATA%\Claude-3p\`（`deploymentMode: 3p`），与 `%APPDATA%\Claude\` 无关。桌面问题先看 `Claude-3p\logs\main.log`。
 - **代理坑**：桌面 app 会把系统代理 `127.0.0.1:33210` 注入 CLI 的 HTTP(S)_PROXY（即使 `ProxyEnable=0`）。本地代理客户端关闭时，桌面对话报 `ConnectionRefused`；独立 `claude` CLI 不受影响。已设 WinINET `ProxyOverride=www.micuapi.ai;*.micuapi.ai` 让网关直连。Clash 类客户端可能覆盖此项，横幅复发就在代理客户端里重加 bypass。
+- **侧边栏分组自动排序**：登录时经 HKCU Run 键 `claude-sidebar-sort` 跑 `tools/sort-sidebar-groups.ps1`（💻 Local 组在前、🌐 服务器组在后，块内保序）。原理与限制：分组顺序存在 `Claude-3p\claude_desktop_config.json` 的 `epitaxyPrefs["dframe-group-scopes"]`，App **仅启动时读取**，运行中外部改写无效且会被内存态覆盖——所以只能登录时（App 启动前）排；当天新增的组先追加末尾，下次启动归位。
 - 配置仓库物理位置：`%USERPROFILE%\.claude-config`（本仓库 clone，2026-09-21 自 `%LOCALAPPDATA%\claude-skills` 迁入）。**不要放 `%LOCALAPPDATA%`**——Claude Desktop 是 MSIX 应用，其进程写 `AppData\Local` 会被透明重定向进包容器 `Packages\Claude_xxxx\LocalCache`，卸载/重置会连仓库一起清空；也不要放 WPS 云盘（无合并机制、占位文件复制不全）。完整部署与迁移步骤见仓库 `docs/windows-setup.md`。
 
 ## HA 服务器专属
