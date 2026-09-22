@@ -167,13 +167,12 @@ The concise version is not a second transcript or a compressed technical log. In
 
 ## Copy-Ready Plain-Text Version
 
-Place `## 可复制版本` after the concise version and make it the final section of the file. Inside it, add one fenced `text` code block that repeats the concise version's date, subsection labels, task titles, and task content without changing their meaning.
+Place `## 可复制版本` after the concise version and make it the final section of the file. Write the date and each subsection label (`今日任务`, `明日计划`) as plain lines outside the code blocks, and give every subsection its own fenced `text` code block that repeats that subsection's task titles and task content without changing their meaning. Each block must start directly at its first numbered item (`1、…`) — no date, label, or blank line inside — so the user can copy one module in one selection. (User-confirmed preference, 2026-09-22.)
 
-Inside the code block:
+Inside each code block:
 
 - use plain text only: no Markdown headings, bullets, bold markers, backticks, or links;
-- number `今日任务` from 1 using `1、2、3……`, then restart `明日计划` from 1;
-- keep subsection labels such as `今日任务` and `明日计划` as unmarked plain-text lines;
+- number `今日任务` from 1 using `1、2、3……`, and restart `明日计划` from 1 in its own block;
 - prefix every numbered daily item with one priority label and keep the `序号、优先级 标题：任务内容` form, for example `1、VVV 具体对象：任务内容`;
 - within `今日任务` and `明日计划` separately, sort items by `VVV` first, then `VV`, then `V`; preserve the subsection boundary and number each subsection independently from 1;
 - use `VVV` for work that directly affects a core deliverable, major decision, release/readiness gate, or time-sensitive blocker; use `VV` for material supporting work; use `V` for lower-urgency follow-up that is still professionally report-worthy;
@@ -186,13 +185,17 @@ Example:
 ````markdown
 ## 可复制版本
 
-```text
 日期：YYYY-MM-DD
 
 今日任务
+
+```text
 1、VVV 具体对象 + 工作类型：核心产出及其项目价值。
+```
 
 明日计划
+
+```text
 1、VV 具体对象 + 下一动作：下一步动作及预期检查点或产物。
 ```
 ````
@@ -241,8 +244,8 @@ Before saving, verify:
 - every workday plan contains a concrete action, object or scope, and an expected deliverable or decision point;
 - the concise version contains both `今日任务` and `明日计划`;
 - Friday daily reports contain no weekly summary or next-cycle plan; those belong only in the separate weekly file;
-- `可复制版本` is the final section and contains exactly one `text` code block;
-- the daily copy-ready block matches the concise version semantically, contains no Markdown markers, and starts both `今日任务` and `明日计划` numbering from 1;
+- `可复制版本` is the final section and contains one `text` code block per subsection (今日任务、明日计划), with the date and subsection labels outside the blocks;
+- each daily copy-ready block matches its concise subsection semantically, contains no Markdown markers, and starts directly at item 1 with no header lines inside the block;
 - every daily copy-ready item has a VVV/VV/V label; each subsection is sorted from VVV to V, has no more than three VVV items, and normally has no more than two VV or two V items;
 - the output path contains no Chinese directory or filename components;
 - the saved file exists and its title date matches its filename.

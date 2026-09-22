@@ -105,16 +105,23 @@ Use this structure:
 
 ## 可复制版本
 
-```text
 周期：YYYY-MM-DD 至 YYYY-MM-DD
 
 本周总结
+
+```text
 1、具体对象 + 周度成果：本周专业成果、项目价值和必要状态。
+```
 
 反思与改善
+
+```text
 本周关键经验及对应改进动作，不使用序号。
+```
 
 下周期计划
+
+```text
 1、具体对象 + 周期动作：下一报告周期的重点动作、范围和预期检查点。
 ```
 ````
@@ -127,7 +134,7 @@ The next-cycle plan must respect the schedule: do not plan work onto statutory h
 
 Reflection must be evidence-based, improvement-oriented, and concise. Synthesize the most important cross-workstream lesson into one paragraph of normally 1-3 sentences using `observed issue or pattern -> impact -> concrete improvement`. Do not use bullets, numbered items, task-by-task headings, generic self-criticism, blame, personality judgments, routine negative results, or unsupported causal claims.
 
-The final `可复制版本` must repeat the weekly concise content in one fenced `text` code block. Inside the block, use plain-text subsection labels, remove all Markdown markers, start `本周总结` and `下周期计划` independently from 1, and keep `反思与改善` as an unnumbered paragraph. Do not add content that is absent from the concise version.
+The final `可复制版本` must repeat the weekly concise content with one fenced `text` code block per subsection (`本周总结`, `反思与改善`, `下周期计划`). Write the cycle dates and subsection labels as plain lines outside the blocks; each block starts directly at its content — numbered items from 1 for `本周总结` and `下周期计划`, an unnumbered paragraph for `反思与改善` — so the user can copy one module in one selection (user-confirmed preference, 2026-09-22). Remove all Markdown markers inside blocks. Do not add content that is absent from the concise version.
 
 ## Weekly Quality Check
 
@@ -145,5 +152,5 @@ Verify that:
 - the detailed and concise sections both include `反思与改善` before `下周期计划`;
 - reflection is one short, evidence-based paragraph with a concrete improvement and no bullets, numbering, or task-by-task split;
 - the concise section orders `本周总结`, `反思与改善`, then `下周期计划`;
-- `可复制版本` is last, matches the concise version semantically, uses one plain-text code block, starts `本周总结` and `下周期计划` numbering from 1, and leaves the reflection paragraph unnumbered;
+- `可复制版本` is last, matches the concise version semantically, uses one plain-text code block per subsection with labels outside the blocks, starts `本周总结` and `下周期计划` numbering from 1 at the top of their blocks, and leaves the reflection paragraph unnumbered;
 - no trivial conversations, simple lookups, or daily-report-generation activity appear as weekly work.
