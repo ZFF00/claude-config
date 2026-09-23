@@ -4,18 +4,12 @@
     "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1",
     "CLAUDE_CODE_ATTRIBUTION_HEADER": "0"
   },
-  "permissions": {
-    "defaultMode": "bypassPermissions"
-  },
-  "model": "sonnet",
-  "enableWorkflows": true,
-  "outputStyle": "Explanatory",
-  "tui": "fullscreen",
-  "skipDangerousModePermissionPrompt": true,
-  "theme": "dark",
   "attribution": {
     "commit": "",
     "pr": ""
+  },
+  "permissions": {
+    "defaultMode": "bypassPermissions"
   },
   "hooks": {
     "SessionStart": [
@@ -24,9 +18,9 @@
           {
             "type": "command",
             "command": "git -C \"$HOME/.claude/skills\" -c 'alias.csync=!sh tools/config-sync.sh pull >/dev/null 2>&1 || true' csync",
-            "async": true,
             "timeout": 60,
-            "statusMessage": "同步 claude-config (pull)"
+            "statusMessage": "同步 claude-config (pull)",
+            "async": true
           }
         ]
       }
@@ -43,5 +37,10 @@
         ]
       }
     ]
-  }
+  },
+  "outputStyle": "Explanatory",
+  "enableWorkflows": true,
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark"
 }
