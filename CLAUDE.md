@@ -20,6 +20,7 @@
 ## claude-config 仓库同步约定
 
 - **自动同步由 hooks 承担**（settings.json 内，随仓库分发到所有机器）：SessionStart 后台 `git pull --ff-only`（静默失败不阻塞）；SessionEnd 检测脏改动则 `add + commit + push`（push 被拒时先 `pull --rebase` 重试）。原 Windows 每小时计划任务 `claude-config-sync` 已停用。
+- **hook 命令必须 bash 与 PowerShell 5.1 双方都能解析**——Windows 上 Claude Code 用 PowerShell 执行 hook 命令，纯 bash 写法（`$(...)`、`&&`、`[ -n ]`、`if...fi`）每次都 ParserError，2026-09-23 前 Windows 侧同步从未生效。现行机制（2026-09-23，commit 40cb3c8）：hook 只写一行"多态"命令（仅用裸 token / `"$HOME/..."` / 单引号字面量三种两边语义一致的元素），`git -C "$HOME/.claude/skills"` 穿过 junction/symlink 自动发现仓库顶层，内联 `!alias` 由 **Git 自带的 sh** 执行 `tools/config-sync.sh`（POSIX sh、行尾必须 LF）。改同步逻辑只改该脚本；别把任何 shell 语法写回 settings.json 的 command 字符串。仓库/脚本缺失时静默退出（HA 等未部署机器无噪音）。
 - **Claude 主动修改配置仓库文件（CLAUDE.md / settings.json / skills / memory 等）后，应立即用有意义的 message commit + push**，不要依赖 SessionEnd 兜底的 `chore(auto-sync)` 提交。
 - 编辑工具（临时文件+重命名写入）和 `git pull` 都会**打断 settings.json / CLAUDE.md 的硬链接**：改完/拉完后核对 `~/.claude/` 与仓库两侧是否一致，不一致就重建硬链接或重跑 deploy 脚本。
 - **git 提交不加任何 AI 归属尾注**：不写 `Co-Authored-By: Claude ...`、"Generated with Claude Code" 等（GitHub 会把 Co-Authored-By 渲染成仓库贡献者）。提交作者统一用 ZFF00 <1138903623@qq.com>（settings.json 已设 `attribution` 为空作机制兜底）。
