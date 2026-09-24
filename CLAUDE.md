@@ -5,6 +5,7 @@
 
 ## 通用（所有机器适用）
 
+- **一律用中文回复**：正文、进度汇报、总结、提问选项、Explanatory 风格的 ★ Insight 块都用中文；代码、命令、路径、提交信息照原样。**上下文压缩/续接会话后尤其注意**——2026-09-24 HA 上 rdc-target-agent 会话压缩后连续几条回复切成了英文，被用户纠正。
 - **无 Claude.ai 账号**：仅用第三方中转 (micuapi.ai) 的 API key，通过 `ANTHROPIC_BASE_URL` / `ANTHROPIC_AUTH_TOKEN` 配置。不要建议 claude.ai 登录流程。
 - **中转站指纹校验**：micuapi 只放行标准 Claude Code 客户端；裸 curl / 非标客户端会被 400/503 拒绝。
 - **写 JSON 必须无 BOM**：用 PowerShell/记事本编辑 `settings.json` 等会加 UTF-8 BOM，导致解析失败（"Unexpected token"）。写法：`[IO.File]::WriteAllText(path, text, (New-Object System.Text.UTF8Encoding($false)))`。
